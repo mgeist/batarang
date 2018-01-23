@@ -14,6 +14,8 @@
       </div>
     </div>
 
+    <button ng-click="goBack()">back</button>
+    <button ng-click="goForward()">forward</button>
     <div class="right averages">
       <div>The last digest cycle took {{ lastDigestTime | number }} ms and had {{ numWatchers || 0 }} watchers</div>
       <div ng-show="::last30Digests.watchers">The last 30 digest cycles averaged {{ last30Digests.time | number }} ms and averaged {{ last30Digests.watchers | number }} watchers.</div>

@@ -12,6 +12,9 @@ angular.module('batarang.app.perf', [])
 
 function PerfController($scope, $timeout, $window) {
 
+  $scope.history = [];
+  $scope.historyIndex = 0;
+
   $scope.watchTimings = [];
   $scope.numWatchers = 0;
   $scope.last30Digests = {};
@@ -59,6 +62,23 @@ function PerfController($scope, $timeout, $window) {
     digests = 0;
   }, 1000);
 
+  $scope.goBack = function () {
+    $scope.historyIndex++;
+    if ($scope.historyIndex >= $scope.history.length) {
+      $scope.historyIndex = $scope.history.length - 1;
+    };
+
+    $scope.watchTimings = $scope.history[($scope.history.length - 1) - $scope.historyIndex];
+  };
+
+  $scope.goForward = function () {
+    $scope.historyIndex--;
+    if ($scope.historyIndex < 0) {
+      $scope.historyIndex = 0; 
+    };
+      
+    $scope.watchTimings = $scope.history[($scope.history.length - 1) - $scope.historyIndex];
+  };
 
   $scope.$on('scope:digest', function (e, digestData) {
 
@@ -81,7 +101,7 @@ function PerfController($scope, $timeout, $window) {
       return prev;
     }, {});
 
-    $scope.watchTimings = Object.keys(reducedWatches)
+    var latestWatchTimings = Object.keys(reducedWatches)
     .filter(function (key) { return reducedWatches[key].time; })
     .map(function (key) {
       return {
@@ -93,6 +113,11 @@ function PerfController($scope, $timeout, $window) {
     .sort(function (a, b) {
       return b.time - a.time;
     });
+
+    $scope.history.push(latestWatchTimings);
+    if ($scope.watchTimings.length === 0) {
+      $scope.watchTimings = latestWatchTimings;
+    };
 
     $scope.numWatchers = digestData.events.length;
     addDataToCanvas(digestData.events.length, digestData.time);
